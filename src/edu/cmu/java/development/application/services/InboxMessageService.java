@@ -33,9 +33,9 @@ public class InboxMessageService {
         Contact contact = new Contact();
         contact.setName("User 1");
         contact.setDescription("Description 1");
-        contact.setExpiration(new Date());
         contact.setPhotoUrl("http://s3.amazonaws.com/37assets/svn/765-default-avatar.png");
         InboxMessage message = new InboxMessage();
+        message.setId(114);
         message.setContact(contact);
         message.setMessage("Renew it and be friendly");
         message.setTimeStamp(new Date().getTime());
@@ -78,7 +78,9 @@ public class InboxMessageService {
     }
 
     @POST
-    @Path("/messages/{id}/status")
+    @Path("/messages/{id}/status/")
+    @Consumes("application/json")
+    @Produces("application/json")
     @ApiOperation(
             value = "Renew a Contact Info Message",
             response = InboxMessage.class
@@ -88,7 +90,7 @@ public class InboxMessageService {
             @ApiResponse(code = 500, message = "Internal server error"),
             @ApiResponse(code = 401, message = "Unauthorized user. Please check the authorization header"),
             @ApiResponse(code = 400, message = "Invalid arguments")})
-    public InboxMessage approveMessage(@PathParam("id") String id, @ApiParam(required = true, value = "status of message: Approved or Denied") @QueryParam("status") boolean status) {
-        return new InboxMessage();
+    public InboxMessage approveMessage(@ApiParam(required = true, value = "the user ID") @HeaderParam("userId") Integer user, @PathParam("id") String id, InboxMessage message) {
+        return message;
     }
 }

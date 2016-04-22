@@ -5,15 +5,27 @@ package edu.cmu.java.development.application.resources;
  */
 public class InboxMessage {
 
+    private Integer id;
     private Contact contact;
     private String message;
     private long timeStamp;
+
+
+    private boolean status;
 
     /**
      * default no-args constructor.
      */
     public InboxMessage() {
 
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     /**
@@ -68,5 +80,13 @@ public class InboxMessage {
      */
     public void setTimeStamp(long timeStamp) {
         this.timeStamp = timeStamp;
+    }
+
+    public boolean isStatus() {
+        return status;
+    }
+
+    public void setStatus(boolean status) {
+        this.status = status;
     }
 }
