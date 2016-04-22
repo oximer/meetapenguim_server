@@ -7,17 +7,18 @@ public class InboxMessage {
 
     private Contact contact;
     private String message;
-    private String timeStamp;
+    private long timeStamp;
 
     /**
      * default no-args constructor.
      */
-    public InboxMessage(){
+    public InboxMessage() {
 
     }
 
     /**
      * Getter for contact.
+     *
      * @return Contact.
      */
     public Contact getContact() {
@@ -26,6 +27,7 @@ public class InboxMessage {
 
     /**
      * Getter for message.
+     *
      * @return String message.
      */
     public String getMessage() {
@@ -34,14 +36,16 @@ public class InboxMessage {
 
     /**
      * Getter for time stamp.
+     *
      * @return String time stamp.
      */
-    public String getTimeStamp() {
+    public long getTimeStamp() {
         return timeStamp;
     }
 
     /**
      * Setter for Contact.
+     *
      * @param contact Contact to set.
      */
     public void setContact(Contact contact) {
@@ -50,6 +54,7 @@ public class InboxMessage {
 
     /**
      * Setter for message.
+     *
      * @param message Message to set.
      */
     public void setMessage(String message) {
@@ -58,9 +63,10 @@ public class InboxMessage {
 
     /**
      * Setter for time stamp.
+     *
      * @param timeStamp Time stamp to set.
      */
-    public void setTimeStamp(String timeStamp) {
+    public void setTimeStamp(long timeStamp) {
         this.timeStamp = timeStamp;
     }
 }

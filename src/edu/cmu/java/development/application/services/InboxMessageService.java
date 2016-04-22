@@ -1,11 +1,13 @@
 package edu.cmu.java.development.application.services;
 
+import edu.cmu.java.development.application.resources.Contact;
 import edu.cmu.java.development.application.resources.InboxMessage;
 import io.swagger.annotations.*;
 
 import javax.ws.rs.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -28,9 +30,19 @@ public class InboxMessageService {
             @ApiResponse(code = 500, message = "Internal server error"),
             @ApiResponse(code = 401, message = "Unauthorized to access this user contact list. Please check the authorization header")})
     public List<InboxMessage> getMessages(@ApiParam(required = false, value = "timestamp of the last time you call this API") @QueryParam("timestamp") long timestamp) throws SQLException {
-        return new ArrayList<InboxMessage>();
+        Contact contact = new Contact();
+        contact.setName("User 1");
+        contact.setDescription("Description 1");
+        contact.setExpiration(new Date());
+        contact.setPhotoUrl("http://s3.amazonaws.com/37assets/svn/765-default-avatar.png");
+        InboxMessage message = new InboxMessage();
+        message.setContact(contact);
+        message.setMessage("Renew it and be friendly");
+        message.setTimeStamp(new Date().getTime());
+        List<InboxMessage> messageList = new ArrayList<InboxMessage>();
+        messageList.add(message);
+        return messageList;
     }
-
 
     @POST
     @Path("/messages")

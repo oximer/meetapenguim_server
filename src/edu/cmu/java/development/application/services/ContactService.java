@@ -6,6 +6,7 @@ import io.swagger.annotations.*;
 import javax.ws.rs.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -60,6 +61,10 @@ public class ContactService {
             @ApiResponse(code = 403, message = "Forbideen access to this information"),
             @ApiResponse(code = 400, message = "Invalid arguments")})
     public Contact getContact(@PathParam("id") String id) {
-        return new Contact();
+        Contact contact = new Contact();
+        contact.setName("Prin");
+        contact.setDescription("Student");
+        contact.setExpiration(new Date());
+        return contact;
     }
 }
