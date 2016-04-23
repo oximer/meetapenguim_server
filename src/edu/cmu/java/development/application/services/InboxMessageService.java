@@ -79,7 +79,6 @@ public class InboxMessageService {
 
     @POST
     @Path("/messages/{id}/status/")
-    @Consumes("application/json")
     @Produces("application/json")
     @ApiOperation(
             value = "Renew a Contact Info Message",
@@ -90,7 +89,8 @@ public class InboxMessageService {
             @ApiResponse(code = 500, message = "Internal server error"),
             @ApiResponse(code = 401, message = "Unauthorized user. Please check the authorization header"),
             @ApiResponse(code = 400, message = "Invalid arguments")})
-    public InboxMessage approveMessage(@ApiParam(required = true, value = "the user ID") @HeaderParam("userId") Integer user, @PathParam("id") String id, InboxMessage message) {
-        return message;
+    public InboxMessage approveMessage(@ApiParam(required = true, value = "the user ID") @HeaderParam("userId") Integer user,
+                                       @PathParam("id") String id, @QueryParam("accepted") boolean accepted) {
+        return new InboxMessage();
     }
 }
