@@ -7,6 +7,9 @@ import java.io.Serializable;
  */
 public class ContactInfo implements Serializable {
 
+    private int id;
+
+
     private Attribute attribute;
     private String extraDescription;
     private String attributeValue;
@@ -21,6 +24,14 @@ public class ContactInfo implements Serializable {
         this.extraDescription = extraDescription;
         this.attributeValue = attributeValue;
         this.editing = false;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public Attribute getAttribute() {

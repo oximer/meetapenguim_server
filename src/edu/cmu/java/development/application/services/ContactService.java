@@ -39,7 +39,7 @@ public class ContactService {
         contact.setDescription("Description 1");
         contact.setPhotoUrl("http://s3.amazonaws.com/37assets/svn/765-default-avatar.png");
         ArrayList<ContactInfo> contactInfoList = new ArrayList<ContactInfo>();
-        ContactInfo contactInfo = new ContactInfo(new Attribute("Nickname", "drawable/ic_account_box_black_24dp"), "teste", "teste_value");
+        ContactInfo contactInfo = new ContactInfo(new Attribute(1, "Nickname", "drawable/ic_account_box_black_24dp"), "teste", "teste_value");
         contactInfoList.add(contactInfo);
         contact.setContactInfoArrayList(contactInfoList);
 
