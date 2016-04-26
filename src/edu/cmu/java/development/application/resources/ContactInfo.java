@@ -35,11 +35,11 @@ public class ContactInfo implements Serializable {
         return extraDescription;
     }
 
-    public String getAtrributeName() {
+    public String getAttributeName() {
         return getAttribute().getName();
     }
 
-    public String getAtrributeValue() {
+    public String getAttributeValue() {
         return attributeValue;
     }
 

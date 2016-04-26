@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Created by urbano on 4/6/16.
@@ -59,7 +60,9 @@ public class ContactService {
             @ApiResponse(code = 500, message = "Internal server error"),
             @ApiResponse(code = 401, message = "Unauthorized to access this user contact list. Please check the authorization header")})
     public Contact createContact(@ApiParam(required = true, value = "The contact to be created") Contact contact) throws SQLException {
-        return new Contact();
+        Random randomGenerator = new Random();
+        contact.setId(randomGenerator.nextInt(Integer.MAX_VALUE));
+        return contact;
     }
 
     @GET
