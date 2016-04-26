@@ -5,7 +5,7 @@ package edu.cmu.java.development.application.resources;
  */
 public class InboxMessage {
 
-    private Integer id;
+    private Integer cloudId;
     private Contact contact;
     private String message;
     private long timeStamp;
@@ -20,12 +20,12 @@ public class InboxMessage {
 
     }
 
-    public Integer getId() {
-        return id;
+    public Integer getCloudId() {
+        return cloudId;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
+    public void setCloudId(Integer cloudId) {
+        this.cloudId = cloudId;
     }
 
     /**

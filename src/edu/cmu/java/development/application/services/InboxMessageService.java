@@ -31,11 +31,12 @@ public class InboxMessageService {
             @ApiResponse(code = 401, message = "Unauthorized to access this user contact list. Please check the authorization header")})
     public List<InboxMessage> getMessages(@ApiParam(required = false, value = "timestamp of the last time you call this API") @QueryParam("timestamp") long timestamp) throws SQLException {
         Contact contact = new Contact();
+        contact.setId(2);
         contact.setName("User 1");
         contact.setDescription("Description 1");
         contact.setPhotoUrl("http://s3.amazonaws.com/37assets/svn/765-default-avatar.png");
         InboxMessage message = new InboxMessage();
-        message.setId(114);
+        message.setCloudId(114);
         message.setContact(contact);
         message.setMessage("Renew it and be friendly");
         message.setTimeStamp(new Date().getTime());

@@ -12,6 +12,8 @@ import java.util.Date;
 public class Contact {
 
     @XmlElement
+    private Integer id;
+    @XmlElement
     private String name;
     @XmlElement
     private ArrayList<ContactInfo> contactInfoArrayList;
@@ -25,7 +27,8 @@ public class Contact {
     @Override
     public String toString() {
         return "Contact{" +
-                "name='" + name + '\'' +
+                "id=" + id +
+                ", name='" + name + '\'' +
                 ", contactInfoArrayList=" + contactInfoArrayList +
                 ", description='" + description + '\'' +
                 ", expiration=" + expiration +
@@ -35,6 +38,15 @@ public class Contact {
 
     public Contact() {
     }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
 
     public Date getExpiration() {
         return expiration;
