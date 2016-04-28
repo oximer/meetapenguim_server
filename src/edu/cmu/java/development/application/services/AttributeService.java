@@ -33,5 +33,6 @@ public class AttributeService {
             @ApiResponse(code = 500, message = "Internal server error")})
     public List<Attribute> board() throws SQLException {
         return new ArrayList<Attribute>();
+        //TODO: Think if we actually need this API.
     }
 }

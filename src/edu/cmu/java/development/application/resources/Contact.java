@@ -1,7 +1,10 @@
 package edu.cmu.java.development.application.resources;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -46,6 +49,22 @@ public class Contact {
     public void setId(Integer id) {
         this.id = id;
     }
+
+
+    //Needed to convert from JSON in JAX-RS to object
+    public static Contact fromString(String jsonString) {
+        ObjectMapper mapper = new ObjectMapper();
+        Contact c = null;
+
+        try {
+            c = mapper.readValue(jsonString, Contact.class);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return c;
+    }
+
 
 
     public Date getExpiration() {

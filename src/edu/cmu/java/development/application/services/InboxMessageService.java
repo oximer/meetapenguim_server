@@ -43,6 +43,7 @@ public class InboxMessageService {
         List<InboxMessage> messageList = new ArrayList<InboxMessage>();
         messageList.add(message);
         return messageList;
+        //TODO: Implement. Currently returns mock data.
     }
 
     @POST
@@ -60,6 +61,7 @@ public class InboxMessageService {
             @ApiResponse(code = 401, message = "Unauthorized to access this user contact list. Please check the authorization header")})
     public List<InboxMessage> createMessage(@ApiParam(required = true, value = "the contact destination") @QueryParam("contactId") String contactId) throws SQLException {
         return new ArrayList<InboxMessage>();
+        //TODO: Implement. Currently returns empty.
     }
 
     @GET
@@ -76,6 +78,7 @@ public class InboxMessageService {
             @ApiResponse(code = 400, message = "Invalid arguments")})
     public InboxMessage getMessage(@PathParam("id") String id) {
         return new InboxMessage();
+        //TODO: Implement. Returns empty.
     }
 
     @POST
@@ -93,5 +96,6 @@ public class InboxMessageService {
     public InboxMessage approveMessage(@ApiParam(required = true, value = "the user ID") @HeaderParam("userId") Integer user,
                                        @PathParam("id") String id, @QueryParam("accepted") boolean accepted) {
         return new InboxMessage();
+        //TODO: Implement.
     }
 }

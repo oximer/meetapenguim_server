@@ -31,7 +31,10 @@ public class ShareService {
             @ApiResponse(code = 500, message = "Internal server error"),
             @ApiResponse(code = 401, message = "Unauthorized to access this user contact list. Please check the authorization header")})
     public List<Contact> getRelationships(@ApiParam(required = false, value = "The id of last user that you receive") @QueryParam("lastContactId") String lastContactId) throws SQLException {
+
+        //TODO: Think if we really need this. Overlaps with contacts/ call.
         return new ArrayList<Contact>();
+
     }
 
     @POST
@@ -46,7 +49,15 @@ public class ShareService {
             @ApiResponse(code = 500, message = "Internal server error"),
             @ApiResponse(code = 401, message = "Unauthorized to access this user contact list. Please check the authorization header"),
             @ApiResponse(code = 403, message = "Missing user B authorization to add him as a User A contact")})
-    public Contact createRelationship(@ApiParam(required = true, value = "The authorization for User B to be added as your contact") @QueryParam("shareAuthorization") ShareAuthorization authorization, @ApiParam(required = true, value = "The contact to be created") @QueryParam("contact") Contact contact) throws SQLException {
+    public Contact createRelationship(
+            @ApiParam(required = true, value = "The authorization for User B to be added as your contact") @QueryParam("shareAuthorization") ShareAuthorization authorization,
+            @ApiParam(required = true, value = "The Contact object of User B, with only the information that User A knows about User B") @QueryParam("contact") Contact contact,
+            @ApiParam(required = true, value = "User A's contactID") @QueryParam("id") int contactID) throws SQLException {
+
+        int fromID = contactID;
+        int toID = contact.getId();
+
+        //TODO: Finish implementation
         return new Contact();
     }
 }
