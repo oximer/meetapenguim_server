@@ -52,7 +52,7 @@ public class Database {
         statement.executeUpdate(command);
 
         for (ContactInfo contactInfo : contact.getContactInfoArrayList()) {
-            String attribute = contactInfo.getAttributeName();
+            String attribute = contactInfo.getAttribute().getName();
 
             command = "select id from attribute where name='%s'";
             command = String.format(command, attribute);

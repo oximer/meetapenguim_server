@@ -1,14 +1,20 @@
 package edu.cmu.java.development.application.resources;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 
 /**
  * Attribute, a field of ContactInfo
  */
+@XmlRootElement(name = "Attribute")
 public class Attribute implements Serializable {
 
+    @XmlElement
     private int id;
+    @XmlElement
     private String name;
+    @XmlElement
     private String iconPath;
 
     public Attribute(int id, String name, String iconPath) {
