@@ -217,20 +217,24 @@ public class Database {
         if (lastUpdated == 0) {
             command = "select id from (select * from contact where (lastUpdateTime < NOW()))";
         } else {
-            command = "select id from (select * from contact where (lastUpdateTime < from_unixtime(%d, '%Y-%m-%d %T')))";
+            command = "select id from (select * from contact where (lastUpdateTime < from_unixtime(%d)))";
             command = String.format(command, lastUpdated);
         }
 
         //Only get contacts that the contactID knows.
         command += "as test where id=any(select `to` from relationship where `from`=" + userID + ");";
 
-        resultSet = statement.executeQuery(command);
+        Statement stmt = connect.createStatement();
+        ResultSet resultSet = stmt.executeQuery(command);
 
         //Loop over all contacts found. Create contact objects.
         while (resultSet.next()) {
             Contact c = getContact(resultSet.getInt(1), userID);
             arrayList.add(c);
         }
+
+        resultSet.close();
+        stmt.close();
 
         return arrayList;
     }

@@ -29,7 +29,7 @@ public class ContactService {
             @ApiResponse(code = 200, message = "Successful retrieving the contact list"),
             @ApiResponse(code = 500, message = "Internal server error"),
             @ApiResponse(code = 401, message = "Unauthorized to access this user contact list. Please check the authorization header")})
-    public List<Contact> getContacts(@ApiParam(required = false, value = "timestamp of the last time you call this API") @QueryParam("timestamp") long timestamp,
+    public List<Contact> getContacts(@ApiParam(required = false, value = "timestamp of the last time you call this API") @HeaderParam("timestamp") long timestamp,
                                      @ApiParam(required = true, value = "contactID of user") @HeaderParam("UserId") int userID) throws SQLException {
 //        Contact contact = new Contact();
 //        contact.setId(2);
@@ -68,7 +68,7 @@ public class ContactService {
 
         //Add to database.
         if (contact != null && contact.getId() == null) {
-            contact.setId(database.getNextContactTableID());
+                contact.setId(database.getNextContactTableID());
             database.addContact(contact);
         }
         //If it is already in database, update instead.
