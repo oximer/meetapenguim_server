@@ -77,9 +77,8 @@ public class ContactService {
             contact.setId(database.getNextContactTableID());
             database.addContact(contact);
         }
-
-        //Update existing contact in database.
-        if (contact != null) {
+        //If it is already in database, update instead.
+        else if (contact != null) {
             database.updateContact(contact);
         }
 

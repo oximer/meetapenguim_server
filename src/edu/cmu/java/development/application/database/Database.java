@@ -18,9 +18,9 @@ public class Database {
     private ResultSet resultSet;
 
     public Database() {
-        String url = "jdbc:mysql://localhost/meetapenguin";
-        String user = "root";
-        String pw = "root";
+        String url = "jdbc:mysql://meetapenguim.cfedu7xab5q8.us-west-2.rds.amazonaws.com:3306/meetapenguin";
+        String user = "Prin";
+        String pw = System.getProperty("DATABASE_PASSWORD");
 
         try {
             Class.forName("com.mysql.jdbc.Driver");
@@ -138,6 +138,10 @@ public class Database {
 
         Contact contact = new Contact();
         ArrayList<ContactInfo> contactInfos = new ArrayList<ContactInfo>();
+
+
+        //TODO:Add expiration check here. If expired, create a contact object with only the boolean expired=true.
+        //TODO: Create a boolean field in contact.
 
         //Grab contact from contact table.
         String command = "select * from contact where id=%d";
