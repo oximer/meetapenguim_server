@@ -1,12 +1,17 @@
 package edu.cmu.java.development.application.services;
 
+import edu.cmu.java.development.application.database.Database;
+import edu.cmu.java.development.application.resources.Attribute;
 import edu.cmu.java.development.application.resources.Contact;
+import edu.cmu.java.development.application.resources.ContactInfo;
 import edu.cmu.java.development.application.resources.ShareAuthorization;
+import edu.cmu.java.development.application.util.MockData;
 import io.swagger.annotations.*;
 
 import javax.ws.rs.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -54,10 +59,12 @@ public class ShareService {
             @ApiParam(required = true, value = "The Contact object of User B, with only the information that User A knows about User B") @QueryParam("contact") Contact contact,
             @ApiParam(required = true, value = "User A's contactID") @QueryParam("id") int contactID) throws SQLException {
 
-        int fromID = contactID;
-        int toID = contact.getId();
+//        Contact c = MockData.mockContact();
 
-        //TODO: Finish implementation
+        Database database = new Database();
+        database.createRelationship(contactID, contact);
+
+        //TODO: Do I need a return value here? Why should it return Contact?
         return new Contact();
     }
 }

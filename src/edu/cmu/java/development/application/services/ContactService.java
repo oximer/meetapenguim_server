@@ -70,48 +70,19 @@ public class ContactService {
     public Contact createContact(@ApiParam(required = true, value = "The contact to be created") @QueryParam("contact") Contact contact) throws SQLException {
         Database database = new Database();
 
+        //Add to database.
         if (contact != null && contact.getId() == null) {
             contact.setId(database.getNextContactTableID());
-
-        }
-
-        if (contact != null) {
             database.addContact(contact);
         }
 
-//        Contact c = new Contact();
-//
-////        c.setExpiration(new Date());
-//        c.setName("John");
-//        c.setDescription("test3");
-//        c.setPhotoUrl("test4");
-//
-//        ArrayList<ContactInfo> al = new ArrayList<ContactInfo>();
-//        ContactInfo c1 = new ContactInfo();
-//        Attribute a1 = new Attribute();
-//        a1.setName("Facebook");
-//        a1.setId(4);
-//        c1.setAttributeValue("myfbpage");
-//        c1.setAttribute(a1);
-////        c1.setId(10);
-//
-//        ContactInfo c2 = new ContactInfo();
-//        Attribute a2 = new Attribute();
-//        a2.setName("Location");
-//        a2.setId(10);
-//        c2.setAttributeValue("pittsburgh");
-//        c2.setAttribute(a2);
-////        c2.setId(10);
-//
-//        al.add(c1);
-//        al.add(c2);
-//
-//        c.setContactInfoArrayList(al);
-//        return c;
+        //Update existing contact in database.
+        if (contact != null) {
 
+        }
 
         return contact;
-        //TODO: Think about return value. Currently does add to contact table correctly.
+        //TODO: Think about return value.
     }
 
     @GET

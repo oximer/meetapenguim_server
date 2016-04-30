@@ -42,7 +42,6 @@ public class Database {
      */
     public void addContact(Contact contact) throws SQLException {
         int contactID = contact.getId();
-//        Date date = contact.getExpiration();
         Timestamp timestamp = new Timestamp(new Date().getTime());
 
         String command = "insert into contact values(default, '%s','%s','%s', '%s');";
@@ -72,6 +71,7 @@ public class Database {
         }
 
     }
+
 
     public int getNextContactTableID() throws SQLException {
         String command = "select auto_increment from information_schema.tables where table_schema = 'meetapenguin' and table_name='contact';";
@@ -164,7 +164,41 @@ public class Database {
     }
 
 
-    public void createRelationship(int userAid, Contact contact) {
+    public void createRelationship(int userAid, Contact contact) throws SQLException {
+        int fromID = userAid;
+        int toID = contact.getId();
+
+
+        String dateCommand = "from_unixtime(%d)";
+
+        //TODO: handle case when expiration is null
+        if (contact.getExpiration() != null) {
+            dateCommand = String.format(dateCommand, contact.getExpiration().getTime() / 1000);
+        }
+
+        //For each attribute, add to relationships table.
+        for (ContactInfo ci : contact.getContactInfoArrayList()) {
+
+            //Check first if it is already in the relationship table. If it is, then only update expiration
+            String checkInTableCommand = "select * from relationship where `from`=%d AND `to`=%d AND attributeid=%d";
+            checkInTableCommand = String.format(checkInTableCommand, fromID, toID, ci.getAttribute().getId());
+            resultSet = statement.executeQuery(checkInTableCommand);
+
+            //Relationship for this attribute is already in the table.
+            if (resultSet.next()) {
+                int rowID = resultSet.getInt(1);
+                String updateExpCommand = "update relationship set expiration=%s where id=" + rowID;
+                updateExpCommand = String.format(updateExpCommand, dateCommand);
+                resultSet.close();
+                statement.executeUpdate(updateExpCommand);
+            }
+            //Relationship not found. Insert relationship into table.
+            else {
+                String command = "insert into relationship values(default, %s,%d,%d,%d);";
+                command = String.format(command, dateCommand, fromID, toID, ci.getAttribute().getId());
+                statement.executeUpdate(command);
+            }
+        }
 
     }
 }
