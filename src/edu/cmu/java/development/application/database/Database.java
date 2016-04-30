@@ -267,7 +267,8 @@ public class Database {
         command = "select * from (select * from contact_info where contactid=%d) as test where attributeid=any" +
                 "(select attributeid from relationship where `from`=%d and `to`=%d);";
         command = String.format(command, contactID, userID, contactID);
-        resultSet = statement.executeQuery(command);
+        Statement stmt = connect.createStatement();
+        ResultSet resultSet = stmt.executeQuery(command);
 
         // Build ContactInfo from results from table.
         while (resultSet.next()) {
@@ -289,13 +290,15 @@ public class Database {
 
             contactInfo.setAttribute(attribute);
             contactInfo.setAttributeValue(attributeValue);
-            contactInfo.setId(contactID);
+            contactInfo.setId(resultSet.getInt(1));
             contactInfo.setEditing(false);
 
             contactInfos.add(contactInfo);
         }
 
         contact.setContactInfoArrayList(contactInfos);
+        resultSet.close();
+        stmt.close();
 
         return contact;
     }

@@ -31,21 +31,6 @@ public class ContactService {
             @ApiResponse(code = 401, message = "Unauthorized to access this user contact list. Please check the authorization header")})
     public List<Contact> getContacts(@ApiParam(required = false, value = "timestamp of the last time you call this API") @HeaderParam("timestamp") long timestamp,
                                      @ApiParam(required = true, value = "contactID of user") @HeaderParam("UserId") int userID) throws SQLException {
-//        Contact contact = new Contact();
-//        contact.setId(2);
-//        contact.setName("User 1");
-//        contact.setDescription("Description 1");
-//        contact.setPhotoUrl("http://s3.amazonaws.com/37assets/svn/765-default-avatar.png");
-//        ArrayList<ContactInfo> contactInfoList = new ArrayList<ContactInfo>();
-//        ContactInfo contactInfo = new ContactInfo(new Attribute(1, "Nickname", "drawable/ic_account_box_black_24dp"), "teste", "teste_value");
-//        contactInfoList.add(contactInfo);
-//        contact.setContactInfoArrayList(contactInfoList);
-//
-//        ArrayList<Contact> contactArrayList = new ArrayList<Contact>();
-//        contactArrayList.add(contact);
-//
-//        return contactArrayList;
-
         Database database = new Database();
         ArrayList<Contact> arrayList = database.getContactsLastUpdated(timestamp, userID);
 
@@ -68,7 +53,7 @@ public class ContactService {
 
         //Add to database.
         if (contact != null && contact.getId() == null) {
-                contact.setId(database.getNextContactTableID());
+            contact.setId(database.getNextContactTableID());
             database.addContact(contact);
         }
         //If it is already in database, update instead.
