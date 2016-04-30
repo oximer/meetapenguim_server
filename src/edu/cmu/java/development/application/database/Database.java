@@ -24,6 +24,7 @@ public class Database {
         String user = "Prin";
         String pw = System.getProperty("DATABASE_PASSWORD");
 
+
         try {
             Class.forName("com.mysql.jdbc.Driver");
             connect = DriverManager.getConnection(url, user, pw);
@@ -32,6 +33,7 @@ public class Database {
 
         } catch (SQLException e) {
             e.printStackTrace();
+            System.out.println(pw);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
