@@ -1,19 +1,13 @@
 package edu.cmu.java.development.application.services;
 
 import edu.cmu.java.development.application.database.Database;
-import edu.cmu.java.development.application.resources.Attribute;
 import edu.cmu.java.development.application.resources.Contact;
-import edu.cmu.java.development.application.resources.ContactInfo;
-import edu.cmu.java.development.application.resources.ContactInfo;
-import edu.cmu.java.development.application.util.MockData;
 import io.swagger.annotations.*;
 
 import javax.ws.rs.*;
-import java.sql.*;
+import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Created by urbano on 4/6/16.
@@ -36,7 +30,7 @@ public class ContactService {
             @ApiResponse(code = 500, message = "Internal server error"),
             @ApiResponse(code = 401, message = "Unauthorized to access this user contact list. Please check the authorization header")})
     public List<Contact> getContacts(@ApiParam(required = false, value = "timestamp of the last time you call this API") @QueryParam("timestamp") long timestamp,
-                                     @ApiParam(required = true, value = "contactID of user") @QueryParam("id") int userID) throws SQLException {
+                                     @ApiParam(required = true, value = "contactID of user") @HeaderParam("UserId") int userID) throws SQLException {
 //        Contact contact = new Contact();
 //        contact.setId(2);
 //        contact.setName("User 1");
@@ -69,7 +63,7 @@ public class ContactService {
             @ApiResponse(code = 200, message = "Successful creating the contact"),
             @ApiResponse(code = 500, message = "Internal server error"),
             @ApiResponse(code = 401, message = "Unauthorized to access this user contact list. Please check the authorization header")})
-    public Contact createContact(@ApiParam(required = true, value = "The contact to be created") @QueryParam("contact") Contact contact) throws SQLException {
+    public Contact createContact(@ApiParam(required = true, value = "The contact to be created") Contact contact) throws SQLException {
         Database database = new Database();
 
         //Add to database.

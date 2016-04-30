@@ -5,8 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
+import java.util.Set;
 
 /**
  * Created by urbano on 4/2/16.
@@ -19,11 +18,11 @@ public class Contact {
     @XmlElement
     private String name;
     @XmlElement
-    private ArrayList<ContactInfo> contactInfoArrayList;
+    private Set<ContactInfo> contactInfoArrayList;
     @XmlElement
     private String description;
     @XmlElement
-    private Date expiration;
+    private long expiration;
     @XmlElement
     private String photoUrl;
 
@@ -67,11 +66,11 @@ public class Contact {
 
 
 
-    public Date getExpiration() {
+    public long getExpiration() {
         return expiration;
     }
 
-    public void setExpiration(Date expiration) {
+    public void setExpiration(long expiration) {
         this.expiration = expiration;
     }
 
@@ -99,11 +98,11 @@ public class Contact {
         this.name = name;
     }
 
-    public ArrayList<ContactInfo> getContactInfoArrayList() {
+    public Set<ContactInfo> getContactInfoArrayList() {
         return contactInfoArrayList;
     }
 
-    public void setContactInfoArrayList(ArrayList<ContactInfo> contactInfoArrayList) {
+    public void setContactInfoArrayList(Set<ContactInfo> contactInfoArrayList) {
         this.contactInfoArrayList = contactInfoArrayList;
     }
 }

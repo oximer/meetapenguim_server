@@ -4,8 +4,9 @@ import edu.cmu.java.development.application.resources.Attribute;
 import edu.cmu.java.development.application.resources.Contact;
 import edu.cmu.java.development.application.resources.ContactInfo;
 
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * Created by Wroger on 4/30/2016.
@@ -15,13 +16,13 @@ public class MockData {
     public static Contact mockContact() {
         Contact c = new Contact();
 
-        c.setExpiration(new Date(1464588270000L));
+        c.setExpiration(new Date(1464588270000L).getTime());
         c.setName("John");
         c.setDescription("test3");
         c.setPhotoUrl("test4");
         c.setId(13);
 
-        ArrayList<ContactInfo> al = new ArrayList<ContactInfo>();
+        Set<ContactInfo> al = new LinkedHashSet<ContactInfo>();
         ContactInfo c1 = new ContactInfo();
         Attribute a1 = new Attribute();
         a1.setName("Facebook");

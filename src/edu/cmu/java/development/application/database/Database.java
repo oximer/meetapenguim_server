@@ -5,8 +5,10 @@ import edu.cmu.java.development.application.resources.Contact;
 import edu.cmu.java.development.application.resources.ContactInfo;
 
 import java.sql.*;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * Created by Prin on 4/24/2016.
@@ -137,7 +139,7 @@ public class Database {
     public Contact getContact(int contactID, int userID) throws SQLException {
 
         Contact contact = new Contact();
-        ArrayList<ContactInfo> contactInfos = new ArrayList<ContactInfo>();
+        Set<ContactInfo> contactInfos = new LinkedHashSet<ContactInfo>();
 
 
         //TODO:Add expiration check here. If expired, create a contact object with only the boolean expired=true.
@@ -242,8 +244,8 @@ public class Database {
         String dateCommand = "from_unixtime(%d)";
 
         //TODO: handle case when expiration is null
-        if (contact.getExpiration() != null) {
-            dateCommand = String.format(dateCommand, contact.getExpiration().getTime() / 1000);
+        if (contact.getExpiration() != 0) {
+            dateCommand = String.format(dateCommand, contact.getExpiration() / 1000);
         }
 
         //For each attribute, add to relationships table.
