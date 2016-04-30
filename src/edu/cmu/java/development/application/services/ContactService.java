@@ -5,6 +5,7 @@ import edu.cmu.java.development.application.resources.Attribute;
 import edu.cmu.java.development.application.resources.Contact;
 import edu.cmu.java.development.application.resources.ContactInfo;
 import edu.cmu.java.development.application.resources.ContactInfo;
+import edu.cmu.java.development.application.util.MockData;
 import io.swagger.annotations.*;
 
 import javax.ws.rs.*;
@@ -35,7 +36,7 @@ public class ContactService {
             @ApiResponse(code = 500, message = "Internal server error"),
             @ApiResponse(code = 401, message = "Unauthorized to access this user contact list. Please check the authorization header")})
     public List<Contact> getContacts(@ApiParam(required = false, value = "timestamp of the last time you call this API") @QueryParam("timestamp") long timestamp,
-                                     @ApiParam(required = true, value = "contactID of user") @QueryParam("id") int contactID) throws SQLException {
+                                     @ApiParam(required = true, value = "contactID of user") @QueryParam("id") int userID) throws SQLException {
 //        Contact contact = new Contact();
 //        contact.setId(2);
 //        contact.setName("User 1");
@@ -51,9 +52,10 @@ public class ContactService {
 //
 //        return contactArrayList;
 
+        Database database = new Database();
+        ArrayList<Contact> arrayList = database.getContactsLastUpdated(timestamp, userID);
 
-        //TODO: Implement.
-        return null;
+        return arrayList;
     }
 
     @POST
@@ -78,15 +80,16 @@ public class ContactService {
 
         //Update existing contact in database.
         if (contact != null) {
-
+            database.updateContact(contact);
         }
 
+
         return contact;
-        //TODO: Think about return value.
+        //TODO: Think about return value. Probably unnecessary.
     }
 
     @GET
-    @Path("/contacts/{id}/")
+    @Path("/contacts/{contactId}/")
     @Produces("application/json")
     @ApiOperation(
             value = "Get a contact information for a specific user",
@@ -98,13 +101,11 @@ public class ContactService {
             @ApiResponse(code = 401, message = "Unauthorized user. Please check the authorization header"),
             @ApiResponse(code = 403, message = "Forbidden access to this information"),
             @ApiResponse(code = 400, message = "Invalid arguments")})
-    public Contact getContact(@PathParam("id") String id) throws SQLException {
+    public Contact getContact(@PathParam("contactId") String contactIdToFind, @QueryParam("userID") int userID) throws SQLException {
         Database database = new Database();
 
-        Contact contact = database.getContact(Integer.parseInt(id));
+        Contact contact = database.getContact(Integer.parseInt(contactIdToFind), userID);
 
         return contact;
-        //TODO: Think if we need to pass any other parameters. Currently, returns all information of a given contact.
-        //TODO: Maybe need to provide the caller's contactid so we can only provide the contact info that the caller is allowed to see.
     }
 }

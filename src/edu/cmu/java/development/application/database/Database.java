@@ -44,12 +44,14 @@ public class Database {
         int contactID = contact.getId();
         Timestamp timestamp = new Timestamp(new Date().getTime());
 
+        //Insert into contact table.
         String command = "insert into contact values(default, '%s','%s','%s', '%s');";
         command = String.format(command, contact.getName(),
                 contact.getDescription(), contact.getPhotoUrl(), timestamp.toString());
 
         statement.executeUpdate(command);
 
+        //Insert contactInfo into contact_info table.
         for (ContactInfo contactInfo : contact.getContactInfoArrayList()) {
             String attribute = contactInfo.getAttribute().getName();
 
@@ -72,6 +74,55 @@ public class Database {
 
     }
 
+    public void updateContact(Contact contact) throws SQLException {
+        int contactID = contact.getId();
+        Timestamp timestamp = new Timestamp(new Date().getTime());
+
+        //Update contact table.
+        String command = "update contact set name='%s',description='%s', photoUrl='%s',lastUpdateTime='%s' where id=%d";
+        command = String.format(command, contact.getName(),
+                contact.getDescription(), contact.getPhotoUrl(), timestamp.toString(), contactID);
+        statement.executeUpdate(command);
+
+        //Update contact_info table.
+        for (ContactInfo contactInfo : contact.getContactInfoArrayList()) {
+            String attribute = contactInfo.getAttribute().getName();
+
+            command = "select id from attribute where name='%s'";
+            command = String.format(command, attribute);
+            resultSet = statement.executeQuery(command);
+
+            //TODO: maybe add exceptionhandling incase attribute not in table
+            resultSet.next();
+            int attributeid = resultSet.getInt(1);
+            resultSet.close();
+
+            //Find if contact info is already in table.
+            command = "select id from contact_info where attributeid=%d and contactid=%d";
+            command = String.format(command, attributeid, contactID);
+            resultSet = statement.executeQuery(command);
+
+            //If the contact_info is already in the table, update the value.
+            if (resultSet.next()) {
+                int rowID = resultSet.getInt(1);
+                resultSet.close();
+                command = "update contact_info set value='%s' where id=" + rowID;
+                command = String.format(command, contactInfo.getAttributeValue());
+                statement.executeUpdate(command);
+            }
+            //If it is not in the table, insert into the table.
+            else {
+                command = "insert into contact_info values(default, '%s', %d, %d)";
+                command = String.format(command, contactInfo.getAttributeValue(),
+                        attributeid, contactID);
+
+                statement.executeUpdate(command);
+            }
+
+
+        }
+
+    }
 
     public int getNextContactTableID() throws SQLException {
         String command = "select auto_increment from information_schema.tables where table_schema = 'meetapenguin' and table_name='contact';";
@@ -83,10 +134,12 @@ public class Database {
         return id;
     }
 
-    public Contact getContact(int contactID) throws SQLException {
+    public Contact getContact(int contactID, int userID) throws SQLException {
 
         Contact contact = new Contact();
+        ArrayList<ContactInfo> contactInfos = new ArrayList<ContactInfo>();
 
+        //Grab contact from contact table.
         String command = "select * from contact where id=%d";
         command = String.format(command, contactID);
         resultSet = statement.executeQuery(command);
@@ -96,6 +149,7 @@ public class Database {
             return null;
         }
 
+        //Build contact object.
         String name = resultSet.getString(2);
         String description = resultSet.getString(3);
         String photoUrl = resultSet.getString(4);
@@ -107,12 +161,15 @@ public class Database {
 
         resultSet.close();
 
-        ArrayList<ContactInfo> contactInfos = new ArrayList<ContactInfo>();
 
-        command = "select * from contact_info where contactid=%d;";
-        command = String.format(command, contactID);
+        // Build ContactInfo from table. Grabs only the contact_info that userA knows aboud userB.
+        //TODO: Does not take into account if information is expired. Maybe fix?
+        command = "select * from (select * from contact_info where contactid=%d) as test where attributeid=any" +
+                "(select attributeid from relationship where `from`=%d and `to`=%d);";
+        command = String.format(command, contactID, userID, contactID);
         resultSet = statement.executeQuery(command);
 
+        // Build ContactInfo from results from table.
         while (resultSet.next()) {
             ContactInfo contactInfo = new ContactInfo();
             Attribute attribute = new Attribute();
@@ -144,23 +201,32 @@ public class Database {
     }
 
 
-    //TODO: Unfinished
-    public ArrayList<Contact> getContactsLastUpdated(long lastUpdated, int contactID) throws SQLException {
+    public ArrayList<Contact> getContactsLastUpdated(long lastUpdated, int userID) throws SQLException {
 
+        ArrayList<Contact> arrayList = new ArrayList<Contact>();
         String command;
 
         //If 0 is input, then get all contacts for the contactid.
         //Otherwise get all contacts since the last time stamp
         if (lastUpdated == 0) {
-            command = "select * from contact where (lastUpdateTime < NOW());";
+            command = "select id from (select * from contact where (lastUpdateTime < NOW()))";
         } else {
-            command = "select * from contact where (lastUpdateTime < from_unixtime(%d, '%Y-%m-%d %T'));";
+            command = "select id from (select * from contact where (lastUpdateTime < from_unixtime(%d, '%Y-%m-%d %T')))";
             command = String.format(command, lastUpdated);
         }
 
+        //Only get contacts that the contactID knows.
+        command += "as test where id=any(select `to` from relationship where `from`=" + userID + ");";
+
         resultSet = statement.executeQuery(command);
 
-        return null;
+        //Loop over all contacts found. Create contact objects.
+        while (resultSet.next()) {
+            Contact c = getContact(resultSet.getInt(1), userID);
+            arrayList.add(c);
+        }
+
+        return arrayList;
     }
 
 
