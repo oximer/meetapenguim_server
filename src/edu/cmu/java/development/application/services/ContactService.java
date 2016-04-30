@@ -2,7 +2,6 @@ package edu.cmu.java.development.application.services;
 
 import edu.cmu.java.development.application.database.Database;
 import edu.cmu.java.development.application.resources.Contact;
-import edu.cmu.java.development.application.util.MockData;
 import io.swagger.annotations.*;
 
 import javax.ws.rs.*;
@@ -30,8 +29,8 @@ public class ContactService {
             @ApiResponse(code = 200, message = "Successful retrieving the contact list"),
             @ApiResponse(code = 500, message = "Internal server error"),
             @ApiResponse(code = 401, message = "Unauthorized to access this user contact list. Please check the authorization header")})
-    public List<Contact> getContacts(@ApiParam(required = false, value = "timestamp of the last time you call this API") @QueryParam("timestamp") long timestamp,
-                                     @ApiParam(required = true, value = "contactID of user") @QueryParam("id") int userID) throws SQLException {
+    public List<Contact> getContacts(@ApiParam(required = false, value = "timestamp of the last time you call this API") @HeaderParam("timestamp") long timestamp,
+                                     @ApiParam(required = true, value = "contactID of user") @HeaderParam("UserId") int userID) throws SQLException {
 //        Contact contact = new Contact();
 //        contact.setId(2);
 //        contact.setName("User 1");
@@ -69,21 +68,8 @@ public class ContactService {
 
         //Add to database.
         if (contact != null && contact.getId() == null) {
-            contact.setId(database.getNextContactTableID());
+                contact.setId(database.getNextContactTableID());
             database.addContact(contact);
-
-//            Contact c1 = MockData.mockContact();
-//            c1.setId((database.getNextContactTableID()));
-//            database.addContact(c1);
-//
-//            Contact c2 = MockData.mockContact1();
-//            c2.setId((database.getNextContactTableID()));
-//            database.addContact(c2);
-//
-//            Contact c3 = MockData.mockContact2();
-//            c3.setId((database.getNextContactTableID()));
-//            database.addContact(c3);
-
         }
         //If it is already in database, update instead.
         else if (contact != null) {
