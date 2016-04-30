@@ -87,4 +87,20 @@ public class ContactInfo implements Serializable {
     public void setAttributeValue(String attributeValue) {
         this.attributeValue = attributeValue;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ContactInfo that = (ContactInfo) o;
+
+        return id == that.id;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return id;
+    }
 }
