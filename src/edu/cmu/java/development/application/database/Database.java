@@ -3,6 +3,7 @@ package edu.cmu.java.development.application.database;
 import edu.cmu.java.development.application.resources.Attribute;
 import edu.cmu.java.development.application.resources.Contact;
 import edu.cmu.java.development.application.resources.ContactInfo;
+import edu.cmu.java.development.application.resources.InboxMessage;
 
 import java.sql.*;
 import java.util.*;
@@ -30,6 +31,7 @@ public class Database {
 
         } catch (SQLException e) {
             e.printStackTrace();
+            System.out.println(pw);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -368,5 +370,43 @@ public class Database {
             }
         }
 
+    }
+
+    public InboxMessage createMessage(int userID, int contactID) throws SQLException {
+
+        //First check if the message already exists. If it does, then do nothing.
+        String command = "select * from message where `from`=%d and `to`=%d";
+        command = String.format(command, userID, contactID);
+        resultSet = statement.executeQuery(command);
+
+        //If already in table, do nothing.
+        if (resultSet.next()) {
+            return null;
+        }
+
+        Timestamp timestamp = new Timestamp(new Date().getTime());
+        command = "insert into message VALUES(default, %d, %d, %d, '%s')";
+        command = String.format(command, userID, contactID, 0, timestamp.toString());
+
+        statement.executeUpdate(command);
+
+        //Find id of message.
+        command = "select * from message where `from`=%d and `to`=%d";
+        command = String.format(command, userID, contactID);
+        resultSet = statement.executeQuery(command);
+
+        resultSet.next();
+        int cloudID = resultSet.getInt(1);
+
+        Contact contact = getContact(contactID, 0);
+
+        InboxMessage message = new InboxMessage();
+        message.setCloudId(cloudID);
+        message.setContact(contact);
+        message.setMessage("");
+        message.setStatus(false);
+        message.setTimeStamp(timestamp.getTime());
+
+        return message;
     }
 }

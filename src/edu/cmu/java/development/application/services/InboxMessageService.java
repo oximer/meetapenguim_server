@@ -1,8 +1,10 @@
 package edu.cmu.java.development.application.services;
 
+import edu.cmu.java.development.application.database.Database;
 import edu.cmu.java.development.application.resources.Contact;
 import edu.cmu.java.development.application.resources.InboxMessage;
 import io.swagger.annotations.*;
+import io.swagger.models.auth.In;
 
 import javax.ws.rs.*;
 import java.sql.SQLException;
@@ -57,11 +59,18 @@ public class InboxMessageService {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successful creating the message"),
             @ApiResponse(code = 500, message = "Internal server error"),
-            @ApiResponse(code = 403, message = "Forbideen create a message with a user that you don't have relationship"),
+            @ApiResponse(code = 403, message = "Forbidden create a message with a user that you don't have relationship"),
             @ApiResponse(code = 401, message = "Unauthorized to access this user contact list. Please check the authorization header")})
-    public List<InboxMessage> createMessage(@ApiParam(required = true, value = "the contact destination") @QueryParam("contactId") String contactId) throws SQLException {
-        return new ArrayList<InboxMessage>();
-        //TODO: Implement. Currently returns empty.
+    public List<InboxMessage> createMessage(@ApiParam(required = true, value = "the contact destination") @QueryParam("contactId") int contactId,
+                                            @HeaderParam("userID") int userID) throws SQLException {
+
+        Database database = new Database();
+        InboxMessage message = database.createMessage(userID, contactId);
+
+        ArrayList<InboxMessage> arrayList = new ArrayList<InboxMessage>();
+        arrayList.add(message);
+
+        return arrayList;
     }
 
     @GET
