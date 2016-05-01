@@ -55,9 +55,23 @@ public class Database {
 
         //Insert contactInfo into contact_info table.
         for (ContactInfo contactInfo : contact.getContactInfoArrayList()) {
-            insertContactInfo(contactID, contactInfo);
-        }
+            String attribute = contactInfo.getAttribute().getName();
 
+            command = "select id from attribute where name='%s'";
+            command = String.format(command, attribute);
+            resultSet = statement.executeQuery(command);
+
+            //TODO: maybe add exceptionhandling incase attribute not in table
+            resultSet.next();
+            int attributeid = resultSet.getInt(1);
+            resultSet.close();
+
+            command = "insert into contact_info values(default, '%s', %d, %d)";
+            command = String.format(command, contactInfo.getAttributeValue(),
+                    attributeid, contactID);
+
+            statement.executeUpdate(command);
+        }
     }
 
     public int insertContactInfo(Integer contactId, ContactInfo contactInfo) throws SQLException {
@@ -83,6 +97,7 @@ public class Database {
         stmt.close();
         return result;
     }
+
 
     public void updateContactInfo(ContactInfo contactInfo) throws SQLException {
         String command = "update contact_info set value='%s' where id=" + contactInfo.getId();
@@ -136,8 +151,10 @@ public class Database {
     }
 
     public List<ContactInfo> getContactInfoFromUser(Integer contactId) throws SQLException {
+
         String command = "select * from contact_info where contactid = %d";
         command = String.format(command, contactId);
+
 
         Statement stmt = connect.createStatement();
         ResultSet resultSet = stmt.executeQuery(command);
@@ -149,10 +166,12 @@ public class Database {
             contactInfoList.add(contactInfo);
         }
 
+
         resultSet.close();
         stmt.close();
         return contactInfoList;
     }
+
 
     /**
      * Delete a contact info
@@ -199,13 +218,14 @@ public class Database {
             command = String.format(command, attribute);
             resultSet = statement.executeQuery(command);
 
+            //TODO: maybe add exceptionhandling incase attribute not in table
             resultSet.next();
             int attributeid = resultSet.getInt(1);
             resultSet.close();
 
             //Find if contact info is already in table.
             command = "select id from contact_info where id=%d";
-            command = String.format(command, contactInfo.getId());
+            command = String.format(command, attributeid, contactInfo.getId());
             resultSet = statement.executeQuery(command);
 
             //If the contact_info is already in the table, update the value.
@@ -216,6 +236,8 @@ public class Database {
             else {
                 contactInfo.setId(insertContactInfo(contactID, contactInfo));
             }
+
+
         }
         return contact;
     }
@@ -499,6 +521,4 @@ public class Database {
 
         return arrayList;
     }
-
-
 }

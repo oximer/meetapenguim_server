@@ -1,15 +1,12 @@
 package edu.cmu.java.development.application.services;
 
 import edu.cmu.java.development.application.database.Database;
-import edu.cmu.java.development.application.resources.Contact;
 import edu.cmu.java.development.application.resources.InboxMessage;
 import io.swagger.annotations.*;
-import io.swagger.models.auth.In;
 
 import javax.ws.rs.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -33,21 +30,11 @@ public class InboxMessageService {
             @ApiResponse(code = 401, message = "Unauthorized to access this user contact list. Please check the authorization header")})
     public List<InboxMessage> getMessages(@ApiParam(required = false, value = "timestamp of the last time you call this API") @QueryParam("timestamp") long timestamp
             , @HeaderParam("userID") int userID) throws SQLException {
-//        Contact contact = new Contact();
-//        contact.setId(2);
-//        contact.setName("User 1");
-//        contact.setDescription("Description 1");
-//        contact.setPhotoUrl("http://s3.amazonaws.com/37assets/svn/765-default-avatar.png");
-//        InboxMessage message = new InboxMessage();
-//        message.setCloudId(114);
-//        message.setContact(contact);
-//        message.setMessage("Renew it and be friendly");
-//        message.setTimeStamp(new Date().getTime());
-//        List<InboxMessage> messageList = new ArrayList<InboxMessage>();
-//        messageList.add(message);
-
-        Database database = new Database();
+            Database database = new Database();
         ArrayList<InboxMessage> arrayList = database.getMessagesLastUpdated(timestamp, userID);
+        for (InboxMessage inboxMessage : arrayList) {
+            inboxMessage.setMessage("This contact is requesting a renew.");
+        }
         return arrayList;
     }
 
@@ -108,8 +95,8 @@ public class InboxMessageService {
             @ApiResponse(code = 401, message = "Unauthorized user. Please check the authorization header"),
             @ApiResponse(code = 400, message = "Invalid arguments")})
     public InboxMessage approveMessage(@ApiParam(required = true, value = "the user ID") @HeaderParam("userId") Integer userId,
-                                       @PathParam("id") int messageId, @QueryParam("accepted") boolean accepted,
-                                       @QueryParam("newExpiration") long expiration) throws SQLException {
+                                           @PathParam("id") int messageId, @QueryParam("accepted") boolean accepted,
+                                           @QueryParam("newExpiration") long expiration) throws SQLException {
 
         Database database = new Database();
 

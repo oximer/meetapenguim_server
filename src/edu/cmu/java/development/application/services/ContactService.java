@@ -58,7 +58,7 @@ public class ContactService {
         }
         //If it is already in database, update instead.
         else if (contact != null) {
-            contact = database.updateContact(contact);
+                contact = database.updateContact(contact);
         }
 
 
