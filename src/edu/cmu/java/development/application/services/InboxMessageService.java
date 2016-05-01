@@ -31,21 +31,24 @@ public class InboxMessageService {
             @ApiResponse(code = 200, message = "Successful retrieving the list of messages"),
             @ApiResponse(code = 500, message = "Internal server error"),
             @ApiResponse(code = 401, message = "Unauthorized to access this user contact list. Please check the authorization header")})
-    public List<InboxMessage> getMessages(@ApiParam(required = false, value = "timestamp of the last time you call this API") @QueryParam("timestamp") long timestamp) throws SQLException {
-        Contact contact = new Contact();
-        contact.setId(2);
-        contact.setName("User 1");
-        contact.setDescription("Description 1");
-        contact.setPhotoUrl("http://s3.amazonaws.com/37assets/svn/765-default-avatar.png");
-        InboxMessage message = new InboxMessage();
-        message.setCloudId(114);
-        message.setContact(contact);
-        message.setMessage("Renew it and be friendly");
-        message.setTimeStamp(new Date().getTime());
-        List<InboxMessage> messageList = new ArrayList<InboxMessage>();
-        messageList.add(message);
-        return messageList;
-        //TODO: Implement. Currently returns mock data.
+    public List<InboxMessage> getMessages(@ApiParam(required = false, value = "timestamp of the last time you call this API") @QueryParam("timestamp") long timestamp
+            , @HeaderParam("userID") int userID) throws SQLException {
+//        Contact contact = new Contact();
+//        contact.setId(2);
+//        contact.setName("User 1");
+//        contact.setDescription("Description 1");
+//        contact.setPhotoUrl("http://s3.amazonaws.com/37assets/svn/765-default-avatar.png");
+//        InboxMessage message = new InboxMessage();
+//        message.setCloudId(114);
+//        message.setContact(contact);
+//        message.setMessage("Renew it and be friendly");
+//        message.setTimeStamp(new Date().getTime());
+//        List<InboxMessage> messageList = new ArrayList<InboxMessage>();
+//        messageList.add(message);
+
+        Database database = new Database();
+        ArrayList<InboxMessage> arrayList = database.getMessagesLastUpdated(timestamp, userID);
+        return arrayList;
     }
 
     @POST
@@ -85,9 +88,11 @@ public class InboxMessageService {
             @ApiResponse(code = 401, message = "Unauthorized user. Please check the authorization header"),
             @ApiResponse(code = 403, message = "Forbideen access to this information"),
             @ApiResponse(code = 400, message = "Invalid arguments")})
-    public InboxMessage getMessage(@PathParam("id") String id) {
-        return new InboxMessage();
-        //TODO: Implement. Returns empty.
+    public InboxMessage getMessage(@PathParam("id") int id) throws SQLException {
+        Database database = new Database();
+        InboxMessage message = database.getMessage(id);
+
+        return message;
     }
 
     @POST
@@ -102,9 +107,19 @@ public class InboxMessageService {
             @ApiResponse(code = 500, message = "Internal server error"),
             @ApiResponse(code = 401, message = "Unauthorized user. Please check the authorization header"),
             @ApiResponse(code = 400, message = "Invalid arguments")})
-    public InboxMessage approveMessage(@ApiParam(required = true, value = "the user ID") @HeaderParam("userId") Integer user,
-                                       @PathParam("id") String id, @QueryParam("accepted") boolean accepted) {
-        return new InboxMessage();
-        //TODO: Implement.
+    public InboxMessage approveMessage(@ApiParam(required = true, value = "the user ID") @HeaderParam("userId") Integer userId,
+                                       @PathParam("id") int messageId, @QueryParam("accepted") boolean accepted,
+                                       @QueryParam("newExpiration") long expiration) throws SQLException {
+
+        Database database = new Database();
+
+
+        //Find correct contact_info, set them to new expiry date.
+        database.updateRelationshipFromMessage(userId, messageId, expiration);
+
+        //Find message, delete from table.
+        database.deleteMessage(messageId);
+
+        return new InboxMessage(); //TODO: Not sure about return value.
     }
 }

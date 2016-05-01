@@ -6,6 +6,10 @@ package edu.cmu.java.development.application.resources;
 public class InboxMessage {
 
     private Integer cloudId;
+
+    /**
+     * The contact who sent the message.
+     */
     private Contact contact;
     private String message;
     private long timeStamp;

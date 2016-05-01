@@ -6,8 +6,10 @@ import edu.cmu.java.development.application.resources.ContactInfo;
 import edu.cmu.java.development.application.resources.InboxMessage;
 
 import java.sql.*;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * Created by Prin on 4/24/2016.
@@ -55,124 +57,28 @@ public class Database {
 
         //Insert contactInfo into contact_info table.
         for (ContactInfo contactInfo : contact.getContactInfoArrayList()) {
-            insertContactInfo(contactID, contactInfo);
+            String attribute = contactInfo.getAttribute().getName();
+
+            command = "select id from attribute where name='%s'";
+            command = String.format(command, attribute);
+            resultSet = statement.executeQuery(command);
+
+            //TODO: maybe add exceptionhandling incase attribute not in table
+            resultSet.next();
+            int attributeid = resultSet.getInt(1);
+            resultSet.close();
+
+            command = "insert into contact_info values(default, '%s', %d, %d)";
+            command = String.format(command, contactInfo.getAttributeValue(),
+                    attributeid, contactID);
+
+            statement.executeUpdate(command);
+
         }
 
     }
 
-    public int insertContactInfo(Integer contactId, ContactInfo contactInfo) throws SQLException {
-        String attribute = contactInfo.getAttribute().getName();
-
-        String command = "select id from attribute where name='%s'";
-        command = String.format(command, attribute);
-        resultSet = statement.executeQuery(command);
-
-        resultSet.next();
-        int attributeid = resultSet.getInt(1);
-        resultSet.close();
-
-        command = "insert into contact_info values(default, '%s', %d, %d)";
-        command = String.format(command, contactInfo.getAttributeValue(),
-                attributeid, contactId);
-
-        Statement stmt = connect.createStatement();
-        stmt.executeUpdate(command, Statement.RETURN_GENERATED_KEYS);
-        ResultSet resultSet = stmt.getGeneratedKeys();
-        resultSet.next();
-        int result = resultSet.getInt(1);
-        stmt.close();
-        return result;
-    }
-
-    public void updateContactInfo(ContactInfo contactInfo) throws SQLException {
-        String command = "update contact_info set value='%s' where id=" + contactInfo.getId();
-        command = String.format(command, contactInfo.getAttributeValue());
-
-        Statement stmt = connect.createStatement();
-        stmt.executeUpdate(command);
-        stmt.close();
-    }
-
-    public ContactInfo GetContactInfo(Integer contactInfoId) throws SQLException {
-        String command = "select * from contact_info where id = %d";
-        command = String.format(command, contactInfoId);
-
-        Statement stmt = connect.createStatement();
-        ResultSet resultSet = stmt.executeQuery(command);
-
-        ContactInfo contactInfo = null;
-        //Loop over all contacts found. Create contact objects.
-        if (resultSet.next()) {
-            contactInfo = new ContactInfo();
-            contactInfo.setId(resultSet.getInt(1));
-            contactInfo.setAttributeValue(resultSet.getString(2));
-            Attribute attribute = getAttribute(resultSet.getInt(3));
-            contactInfo.setAttribute(attribute);
-        }
-
-        resultSet.close();
-        stmt.close();
-        return contactInfo;
-    }
-
-    public Attribute getAttribute(Integer attributeId) throws SQLException {
-        String command = "select * from attribute where id = %d";
-        command = String.format(command, attributeId);
-
-        Statement stmt = connect.createStatement();
-        ResultSet resultSet = stmt.executeQuery(command);
-
-        Attribute attribute = null;
-        //Loop over all contacts found. Create contact objects.
-        if (resultSet.next()) {
-            attribute = new Attribute();
-            attribute.setId(resultSet.getInt(1));
-            attribute.setName(resultSet.getString(2));
-        }
-
-        resultSet.close();
-        stmt.close();
-        return attribute;
-    }
-
-    public List<ContactInfo> getContactInfoFromUser(Integer contactId) throws SQLException {
-        String command = "select * from contact_info where contactid = %d";
-        command = String.format(command, contactId);
-
-        Statement stmt = connect.createStatement();
-        ResultSet resultSet = stmt.executeQuery(command);
-
-        List<ContactInfo> contactInfoList = new ArrayList<ContactInfo>();
-        //Loop over all contacts found. Create contact objects.
-        while (resultSet.next()) {
-            ContactInfo contactInfo = GetContactInfo(resultSet.getInt(1));
-            contactInfoList.add(contactInfo);
-        }
-
-        resultSet.close();
-        stmt.close();
-        return contactInfoList;
-    }
-
-    /**
-     * Delete a contact info
-     *
-     * @param contactInfoId con
-     * @return Return true if delete, return false if fail.
-     * @throws SQLException
-     */
-    public boolean deleteContactInfo(int contactInfoId) throws SQLException {
-        String command = "delete from contact_info where id = %d";
-        command = String.format(command, contactInfoId);
-
-        Statement stmt = connect.createStatement();
-        int result = stmt.executeUpdate(command);
-
-        stmt.close();
-        return result > 0;
-    }
-
-    public Contact updateContact(Contact contact) throws SQLException {
+    public void updateContact(Contact contact) throws SQLException {
         int contactID = contact.getId();
         Timestamp timestamp = new Timestamp(new Date().getTime());
 
@@ -182,42 +88,44 @@ public class Database {
                 contact.getDescription(), contact.getPhotoUrl(), timestamp.toString(), contactID);
         statement.executeUpdate(command);
 
-        Set<ContactInfo> newContactInfoList = contact.getContactInfoArrayList();
-        List<ContactInfo> contactInfoListToRemove = getContactInfoFromUser(contactID);
-        contactInfoListToRemove.removeAll(newContactInfoList);
-
-        //Contacts to be removed
-        for (ContactInfo info : contactInfoListToRemove) {
-            deleteContactInfo(info.getId());
-        }
-
         //Update contact_info table.
-        for (ContactInfo contactInfo : newContactInfoList) {
+        for (ContactInfo contactInfo : contact.getContactInfoArrayList()) {
             String attribute = contactInfo.getAttribute().getName();
 
             command = "select id from attribute where name='%s'";
             command = String.format(command, attribute);
             resultSet = statement.executeQuery(command);
 
+            //TODO: maybe add exceptionhandling incase attribute not in table
             resultSet.next();
             int attributeid = resultSet.getInt(1);
             resultSet.close();
 
             //Find if contact info is already in table.
-            command = "select id from contact_info where id=%d";
-            command = String.format(command, contactInfo.getId());
+            command = "select id from contact_info where attributeid=%d and contactid=%d";
+            command = String.format(command, attributeid, contactID);
             resultSet = statement.executeQuery(command);
 
             //If the contact_info is already in the table, update the value.
             if (resultSet.next()) {
-                updateContactInfo(contactInfo);
+                int rowID = resultSet.getInt(1);
+                resultSet.close();
+                command = "update contact_info set value='%s' where id=" + rowID;
+                command = String.format(command, contactInfo.getAttributeValue());
+                statement.executeUpdate(command);
             }
             //If it is not in the table, insert into the table.
             else {
-                contactInfo.setId(insertContactInfo(contactID, contactInfo));
+                command = "insert into contact_info values(default, '%s', %d, %d)";
+                command = String.format(command, contactInfo.getAttributeValue(),
+                        attributeid, contactID);
+
+                statement.executeUpdate(command);
             }
+
+
         }
-        return contact;
+
     }
 
     public int getNextContactTableID() throws SQLException {
@@ -267,8 +175,7 @@ public class Database {
         command = "select * from (select * from contact_info where contactid=%d) as test where attributeid=any" +
                 "(select attributeid from relationship where `from`=%d and `to`=%d);";
         command = String.format(command, contactID, userID, contactID);
-        Statement stmt = connect.createStatement();
-        ResultSet resultSet = stmt.executeQuery(command);
+        resultSet = statement.executeQuery(command);
 
         // Build ContactInfo from results from table.
         while (resultSet.next()) {
@@ -290,15 +197,13 @@ public class Database {
 
             contactInfo.setAttribute(attribute);
             contactInfo.setAttributeValue(attributeValue);
-            contactInfo.setId(resultSet.getInt(1));
+            contactInfo.setId(contactID);
             contactInfo.setEditing(false);
 
             contactInfos.add(contactInfo);
         }
 
         contact.setContactInfoArrayList(contactInfos);
-        resultSet.close();
-        stmt.close();
 
         return contact;
     }
@@ -393,23 +298,110 @@ public class Database {
 
         statement.executeUpdate(command);
 
-        //Find id of message.
+        //Get messageID.
         command = "select * from message where `from`=%d and `to`=%d";
         command = String.format(command, userID, contactID);
         resultSet = statement.executeQuery(command);
 
         resultSet.next();
         int cloudID = resultSet.getInt(1);
+        resultSet.close();
 
-        Contact contact = getContact(contactID, 0);
-
-        InboxMessage message = new InboxMessage();
-        message.setCloudId(cloudID);
-        message.setContact(contact);
-        message.setMessage("");
-        message.setStatus(false);
-        message.setTimeStamp(timestamp.getTime());
+        InboxMessage message = getMessage(cloudID);
 
         return message;
+    }
+
+    public InboxMessage getMessage(int messageID) throws SQLException {
+        String command = "select * from message where id=%d";
+        command = String.format(command, messageID);
+        resultSet = statement.executeQuery(command);
+
+        //If not in table, return null.
+        if (!resultSet.next()) {
+            return null;
+        } else {
+            int contactID = resultSet.getInt(2);
+            boolean delivered = resultSet.getInt(4) == 1;
+//            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//            Date date = sdf.parse(resultSet.getDate)
+            Date date = resultSet.getDate(5);
+
+            Contact contact = getContact(contactID, 0);
+
+            InboxMessage message = new InboxMessage();
+            message.setCloudId(messageID);
+            message.setStatus(delivered);
+            message.setMessage("");
+            message.setTimeStamp(date.getTime());
+            message.setContact(contact);
+
+            return message;
+        }
+
+    }
+
+    public void updateRelationshipFromMessage(int userID, int messageID, long expiration) throws SQLException {
+
+        Timestamp timestamp = new Timestamp(expiration);
+
+        //UserID(31) has approved messageID.to
+        //30.from: user31.to, can I renew your information? messageid=2
+        //31.to: sure. messageid2.approve.
+        //approve(userID31, messageid2, new expiration).
+
+        //The one approving the renewal.
+        int aproverID = userID;
+        //The one that is getting his permissions renewed.
+        int aproveeID;
+
+        String command;
+
+        //Find the aprovee contactID. This is the person who is getting their relationship renewed.
+        command = "select `from` from message where id=" + messageID;
+        resultSet = statement.executeQuery(command);
+        resultSet.next();
+        aproveeID = resultSet.getInt(1);
+        resultSet.close();
+
+        //Update the expiration where from= aprovee and to=aprover.
+        command = "update relationship set expiration='%s' where `from`=%d and `to`=%d";
+        command = String.format(command, timestamp.toString(), aproveeID, aproverID);
+        statement.executeUpdate(command);
+
+    }
+
+    public void deleteMessage(int messageID) throws SQLException {
+        String command = "delete from message where id=" + messageID;
+        statement.executeUpdate(command);
+    }
+
+    public ArrayList<InboxMessage> getMessagesLastUpdated(long lastUpdated, int userID) throws SQLException {
+        ArrayList<InboxMessage> arrayList = new ArrayList<InboxMessage>();
+        String command;
+
+        //If 0 is input, then get all messages
+        //Otherwise get all contacts since the last time stamp
+        if (lastUpdated == 0) {
+            command = "select id from (select * from message where (timestamp < NOW()))";
+        } else {
+            command = "select id from (select * from message where (timestamp < from_unixtime(%d)))";
+            command = String.format(command, lastUpdated);
+        }
+
+        //Only get messages addressed to the user knows.
+        command += "as test where id=any(select id from message where `to`=" + userID + ");";
+
+        Statement stmt = connect.createStatement();
+        ResultSet resultSet = stmt.executeQuery(command);
+
+        while (resultSet.next()) {
+            InboxMessage message = getMessage(resultSet.getInt(1));
+            arrayList.add(message);
+        }
+        resultSet.close();
+        stmt.close();
+
+        return arrayList;
     }
 }
