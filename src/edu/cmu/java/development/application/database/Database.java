@@ -393,23 +393,112 @@ public class Database {
 
         statement.executeUpdate(command);
 
-        //Find id of message.
+        //Get messageID.
         command = "select * from message where `from`=%d and `to`=%d";
         command = String.format(command, userID, contactID);
         resultSet = statement.executeQuery(command);
 
         resultSet.next();
         int cloudID = resultSet.getInt(1);
+        resultSet.close();
 
-        Contact contact = getContact(contactID, 0);
-
-        InboxMessage message = new InboxMessage();
-        message.setCloudId(cloudID);
-        message.setContact(contact);
-        message.setMessage("");
-        message.setStatus(false);
-        message.setTimeStamp(timestamp.getTime());
+        InboxMessage message = getMessage(cloudID);
 
         return message;
     }
+
+    public InboxMessage getMessage(int messageID) throws SQLException {
+        String command = "select * from message where id=%d";
+        command = String.format(command, messageID);
+        resultSet = statement.executeQuery(command);
+
+        //If not in table, return null.
+        if (!resultSet.next()) {
+            return null;
+        } else {
+            int contactID = resultSet.getInt(2);
+            boolean delivered = resultSet.getInt(4) == 1;
+//            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//            Date date = sdf.parse(resultSet.getDate)
+            Date date = resultSet.getDate(5);
+
+            Contact contact = getContact(contactID, 0);
+
+            InboxMessage message = new InboxMessage();
+            message.setCloudId(messageID);
+            message.setStatus(delivered);
+            message.setMessage("");
+            message.setTimeStamp(date.getTime());
+            message.setContact(contact);
+
+            return message;
+        }
+
+    }
+
+    public void updateRelationshipFromMessage(int userID, int messageID, long expiration) throws SQLException {
+
+        Timestamp timestamp = new Timestamp(expiration);
+
+        //UserID(31) has approved messageID.to
+        //30.from: user31.to, can I renew your information? messageid=2
+        //31.to: sure. messageid2.approve.
+        //approve(userID31, messageid2, new expiration).
+
+        //The one approving the renewal.
+        int aproverID = userID;
+        //The one that is getting his permissions renewed.
+        int aproveeID;
+
+        String command;
+
+        //Find the aprovee contactID. This is the person who is getting their relationship renewed.
+        command = "select `from` from message where id=" + messageID;
+        resultSet = statement.executeQuery(command);
+        resultSet.next();
+        aproveeID = resultSet.getInt(1);
+        resultSet.close();
+
+        //Update the expiration where from= aprovee and to=aprover.
+        command = "update relationship set expiration='%s' where `from`=%d and `to`=%d";
+        command = String.format(command, timestamp.toString(), aproveeID, aproverID);
+        statement.executeUpdate(command);
+
+    }
+
+    public void deleteMessage(int messageID) throws SQLException {
+        String command = "delete from message where id=" + messageID;
+        statement.executeUpdate(command);
+    }
+
+    public ArrayList<InboxMessage> getMessagesLastUpdated(long lastUpdated, int userID) throws SQLException {
+        ArrayList<InboxMessage> arrayList = new ArrayList<InboxMessage>();
+        String command;
+
+        //If 0 is input, then get all messages
+        //Otherwise get all contacts since the last time stamp
+        if (lastUpdated == 0) {
+            command = "select id from (select * from message where (timestamp < NOW()))";
+        } else {
+            command = "select id from (select * from message where (timestamp < from_unixtime(%d)))";
+            command = String.format(command, lastUpdated);
+        }
+
+        //Only get messages addressed to the user knows.
+        command += "as test where id=any(select id from message where `to`=" + userID + ");";
+
+        Statement stmt = connect.createStatement();
+        ResultSet resultSet = stmt.executeQuery(command);
+
+        while (resultSet.next()) {
+            InboxMessage message = getMessage(resultSet.getInt(1));
+            arrayList.add(message);
+        }
+        resultSet.close();
+        stmt.close();
+
+        return arrayList;
+    }
+
+
 }
