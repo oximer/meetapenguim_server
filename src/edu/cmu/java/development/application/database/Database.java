@@ -78,7 +78,7 @@ public class Database {
 
     }
 
-    public void updateContact(Contact contact) throws SQLException {
+    public Contact updateContact(Contact contact) throws SQLException {
         int contactID = contact.getId();
         Timestamp timestamp = new Timestamp(new Date().getTime());
 
@@ -125,7 +125,7 @@ public class Database {
 
 
         }
-
+        return null; //TODO: Fix this.
     }
 
     public int getNextContactTableID() throws SQLException {
