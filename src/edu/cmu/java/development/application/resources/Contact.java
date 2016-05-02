@@ -26,6 +26,12 @@ public class Contact {
     @XmlElement
     private String photoUrl;
 
+    @XmlElement
+    private String zipCode = "94043";
+    @XmlElement
+    private int profilePicResId;
+
+
     @Override
     public String toString() {
         return "Contact{" +
@@ -104,5 +110,21 @@ public class Contact {
 
     public void setContactInfoArrayList(Set<ContactInfo> contactInfoArrayList) {
         this.contactInfoArrayList = contactInfoArrayList;
+    }
+
+    public int getProfilePicResId() {
+        return profilePicResId;
+    }
+
+    public void setProfilePicResId(int profilePicResId) {
+        this.profilePicResId = profilePicResId;
+    }
+
+    public String getZipCode() {
+        return zipCode;
+    }
+
+    public void setZipCode(String zipCode) {
+        this.zipCode = zipCode;
     }
 }
