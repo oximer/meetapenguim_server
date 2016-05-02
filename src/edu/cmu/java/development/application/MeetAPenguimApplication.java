@@ -1,7 +1,6 @@
 package edu.cmu.java.development.application;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
-import edu.cmu.java.development.application.services.AttributeService;
 import edu.cmu.java.development.application.services.ContactService;
 import edu.cmu.java.development.application.services.InboxMessageService;
 import edu.cmu.java.development.application.services.ShareService;
@@ -15,7 +14,6 @@ public class MeetAPenguimApplication extends ResourceConfig {
     public MeetAPenguimApplication() {
         packages("edu.cmu.java.development.application.resources");
         register(ContactService.class);
-        register(AttributeService.class);
         register(InboxMessageService.class);
         register(ShareService.class);
         register(JacksonJaxbJsonProvider.class);

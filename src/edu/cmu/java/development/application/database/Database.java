@@ -12,7 +12,7 @@ import java.util.Date;
 /**
  * Created by Prin on 4/24/2016.
  */
-public class Database {
+public class Database implements ContactDatabase, MessageDatabase, RelationshipDatabase {
 
     private Connection connect;
     private Statement statement;
@@ -37,11 +37,6 @@ public class Database {
         }
     }
 
-    /**
-     * Adds contact to contact and contact info tables.
-     *
-     * @param contact
-     */
     public void addContact(Contact contact) throws SQLException {
         int contactID = contact.getId();
         Timestamp timestamp = new Timestamp(new Date().getTime());
@@ -61,7 +56,6 @@ public class Database {
             command = String.format(command, attribute);
             resultSet = statement.executeQuery(command);
 
-            //TODO: maybe add exceptionhandling incase attribute not in table
             resultSet.next();
             int attributeid = resultSet.getInt(1);
             resultSet.close();
@@ -74,7 +68,7 @@ public class Database {
         }
     }
 
-    public int insertContactInfo(Integer contactId, ContactInfo contactInfo) throws SQLException {
+    private int insertContactInfo(Integer contactId, ContactInfo contactInfo) throws SQLException {
         String attribute = contactInfo.getAttribute().getName();
 
         String command = "select id from attribute where name='%s'";
@@ -99,7 +93,7 @@ public class Database {
     }
 
 
-    public void updateContactInfo(ContactInfo contactInfo) throws SQLException {
+    private void updateContactInfo(ContactInfo contactInfo) throws SQLException {
         String command = "update contact_info set value='%s' where id=" + contactInfo.getId();
         command = String.format(command, contactInfo.getAttributeValue());
 
@@ -108,7 +102,7 @@ public class Database {
         stmt.close();
     }
 
-    public ContactInfo GetContactInfo(Integer contactInfoId) throws SQLException {
+    private ContactInfo getContactInfo(Integer contactInfoId) throws SQLException {
         String command = "select * from contact_info where id = %d";
         command = String.format(command, contactInfoId);
 
@@ -130,7 +124,7 @@ public class Database {
         return contactInfo;
     }
 
-    public Attribute getAttribute(Integer attributeId) throws SQLException {
+    private Attribute getAttribute(Integer attributeId) throws SQLException {
         String command = "select * from attribute where id = %d";
         command = String.format(command, attributeId);
 
@@ -150,7 +144,7 @@ public class Database {
         return attribute;
     }
 
-    public List<ContactInfo> getContactInfoFromUser(Integer contactId) throws SQLException {
+    private List<ContactInfo> getContactInfoFromUser(Integer contactId) throws SQLException {
 
         String command = "select * from contact_info where contactid = %d";
         command = String.format(command, contactId);
@@ -162,7 +156,7 @@ public class Database {
         List<ContactInfo> contactInfoList = new ArrayList<ContactInfo>();
         //Loop over all contacts found. Create contact objects.
         while (resultSet.next()) {
-            ContactInfo contactInfo = GetContactInfo(resultSet.getInt(1));
+            ContactInfo contactInfo = getContactInfo(resultSet.getInt(1));
             contactInfoList.add(contactInfo);
         }
 
@@ -180,7 +174,7 @@ public class Database {
      * @return Return true if delete, return false if fail.
      * @throws SQLException
      */
-    public boolean deleteContactInfo(int contactInfoId) throws SQLException {
+    private boolean deleteContactInfo(int contactInfoId) throws SQLException {
         String command = "delete from contact_info where id = %d";
         command = String.format(command, contactInfoId);
 
@@ -218,7 +212,6 @@ public class Database {
             command = String.format(command, attribute);
             resultSet = statement.executeQuery(command);
 
-            //TODO: maybe add exceptionhandling incase attribute not in table
             resultSet.next();
             int attributeid = resultSet.getInt(1);
             resultSet.close();
@@ -257,10 +250,6 @@ public class Database {
         Contact contact = new Contact();
         Set<ContactInfo> contactInfos = new LinkedHashSet<ContactInfo>();
 
-
-        //TODO:Add expiration check here. If expired, create a contact object with only the boolean expired=true.
-        //TODO: Create a boolean field in contact.
-
         //Grab contact from contact table.
         String command = "select * from contact where id=%d";
         command = String.format(command, contactID);
@@ -285,7 +274,6 @@ public class Database {
 
 
         // Build ContactInfo from table. Grabs only the contact_info that userA knows aboud userB.
-        //TODO: Does not take into account if information is expired. Maybe fix?
         command = "select * from (select * from contact_info where contactid=%d) as test where attributeid=any" +
                 "(select attributeid from relationship where `from`=%d and `to`=%d);";
         command = String.format(command, contactID, userID, contactID);
@@ -366,7 +354,6 @@ public class Database {
 
         String dateCommand = "from_unixtime(%d)";
 
-        //TODO: handle case when expiration is null
         if (contact.getExpiration() != 0) {
             dateCommand = String.format(dateCommand, contact.getExpiration() / 1000);
         }
@@ -440,8 +427,6 @@ public class Database {
         } else {
             int contactID = resultSet.getInt(2);
             boolean delivered = resultSet.getInt(4) == 1;
-//            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//            Date date = sdf.parse(resultSet.getDate)
             Date date = resultSet.getDate(5);
 
             Contact contact = getContact(contactID, 0);

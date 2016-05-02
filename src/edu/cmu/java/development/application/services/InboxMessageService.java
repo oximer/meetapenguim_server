@@ -107,6 +107,6 @@ public class InboxMessageService {
         //Find message, delete from table.
         database.deleteMessage(messageId);
 
-        return new InboxMessage(); //TODO: Not sure about return value.
+        return new InboxMessage();
     }
 }

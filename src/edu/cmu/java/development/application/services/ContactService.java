@@ -61,9 +61,7 @@ public class ContactService {
                 contact = database.updateContact(contact);
         }
 
-
         return contact;
-        //TODO: Think about return value. Probably unnecessary.
     }
 
     @GET
