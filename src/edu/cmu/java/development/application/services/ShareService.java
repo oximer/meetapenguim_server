@@ -33,6 +33,11 @@ public class ShareService {
             @ApiParam(required = true, value = "The Contact object of User B, with only the information that User A knows about User B") Contact contact,
             @ApiParam(required = true, value = "User A's contactID") @HeaderParam("id") int contactID) throws SQLException {
 
+        System.out.println("=================================");
+        System.out.println("contactID: " + contactID);
+        System.out.println("contact: " + contact);
+        System.out.println("=================================");
+
         Database database = new Database();
         database.createRelationship(contactID, contact);
 

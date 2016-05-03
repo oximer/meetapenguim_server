@@ -49,6 +49,7 @@ public class ContactService {
             @ApiResponse(code = 500, message = "Internal server error"),
             @ApiResponse(code = 401, message = "Unauthorized to access this user contact list. Please check the authorization header")})
     public Contact createContact(@ApiParam(required = true, value = "The contact to be created") Contact contact) throws SQLException {
+
         Database database = new Database();
 
         //Add to database.

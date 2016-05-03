@@ -193,7 +193,9 @@ public class Database implements ContactDatabase, MessageDatabase, RelationshipD
         String command = "update contact set name='%s',description='%s', photoUrl='%s',lastUpdateTime='%s' where id=%d";
         command = String.format(command, contact.getName(),
                 contact.getDescription(), contact.getPhotoUrl(), timestamp.toString(), contactID);
-        statement.executeUpdate(command);
+        Statement stmt = connect.createStatement();
+        stmt.executeUpdate(command);
+        stmt.close();
 
         Set<ContactInfo> newContactInfoList = contact.getContactInfoArrayList();
         List<ContactInfo> contactInfoListToRemove = getContactInfoFromUser(contactID);
