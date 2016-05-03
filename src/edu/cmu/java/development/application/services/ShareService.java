@@ -2,13 +2,12 @@ package edu.cmu.java.development.application.services;
 
 import edu.cmu.java.development.application.database.Database;
 import edu.cmu.java.development.application.resources.Contact;
-import edu.cmu.java.development.application.resources.ShareAuthorization;
 import io.swagger.annotations.*;
 
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import java.sql.SQLException;
 
 /**
@@ -31,10 +30,8 @@ public class ShareService {
             @ApiResponse(code = 401, message = "Unauthorized to access this user contact list. Please check the authorization header"),
             @ApiResponse(code = 403, message = "Missing user B authorization to add him as a User A contact")})
     public Contact createRelationship(
-            @ApiParam(required = true, value = "The authorization for User B to be added as your contact") @QueryParam("shareAuthorization") ShareAuthorization authorization,
-            @ApiParam(required = true, value = "The Contact object of User B, with only the information that User A knows about User B") @QueryParam("contact") Contact contact,
-            @ApiParam(required = true, value = "User A's contactID") @QueryParam("id") int contactID) throws SQLException {
-
+            @ApiParam(required = true, value = "The Contact object of User B, with only the information that User A knows about User B") Contact contact,
+            @ApiParam(required = true, value = "User A's contactID") @HeaderParam("id") int contactID) throws SQLException {
 
         Database database = new Database();
         database.createRelationship(contactID, contact);

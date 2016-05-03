@@ -351,10 +351,11 @@ public class Database implements ContactDatabase, MessageDatabase, RelationshipD
         int fromID = userAid;
         int toID = contact.getId();
 
-
+        Timestamp timestamp = new Timestamp(new Date().getTime());
         String dateCommand = "from_unixtime(%d)";
 
         if (contact.getExpiration() != 0) {
+            timestamp = new Timestamp(contact.getExpiration());
             dateCommand = String.format(dateCommand, contact.getExpiration() / 1000);
         }
 
@@ -369,15 +370,15 @@ public class Database implements ContactDatabase, MessageDatabase, RelationshipD
             //Relationship for this attribute is already in the table.
             if (resultSet.next()) {
                 int rowID = resultSet.getInt(1);
-                String updateExpCommand = "update relationship set expiration=%s where id=" + rowID;
-                updateExpCommand = String.format(updateExpCommand, dateCommand);
+                String updateExpCommand = "update relationship set expiration='%s' where id=" + rowID;
+                updateExpCommand = String.format(updateExpCommand, timestamp.toString());
                 resultSet.close();
                 statement.executeUpdate(updateExpCommand);
             }
             //Relationship not found. Insert relationship into table.
             else {
-                String command = "insert into relationship values(default, %s,%d,%d,%d);";
-                command = String.format(command, dateCommand, fromID, toID, ci.getAttribute().getId());
+                String command = "insert into relationship values(default, '%s',%d,%d,%d);";
+                command = String.format(command, timestamp.toString(), fromID, toID, ci.getAttribute().getId());
                 statement.executeUpdate(command);
             }
         }
