@@ -68,7 +68,9 @@ BBLogin.setInstallationCredentials(“InstallationId”,”InstallationSecret”
 Caso, seu aplicativo esteja em fase de desenvolvimento e você ainda não possua backend funcional, você pode definir o seu PARTNER_ID and PARTNER_SECRET no SDK.
 Entretanto, você não deve publicar seu aplicativo dessa maneira. Isso acabaria por expor suas credenciais, permitindo que outras pessoas gerem credenciais de instalação vinculados ao seu aplicativo.
 
-``` BBLogin.setPartnerId("7da5626c-050a-4c14-874d-6c188f8abdf"); BBLogin.setPartnerSecret("7b244153-35ea-4d79-810c-ebd8cc921573"); 
+```
+BBLogin.setPartnerId("7da5626c-050a-4c14-874d-6c188f8abdf");
+BBLogin.setPartnerSecret("7b244153-35ea-4d79-810c-ebd8cc921573"); 
 ```
 
 
