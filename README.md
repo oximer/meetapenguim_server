@@ -61,12 +61,13 @@ BBLogin.initialize(getApplicationContext());
 Continue a inicialização definindo algumas informações básicas importantes para o funcionamento do SDK.
 
 ```
-BBLogin.setPushCode("987654321"); BBLogin.setRedirectUrl("loginbb://auth");
+BBLogin.setPushCode("987654321");
+BBLogin.setRedirectUrl("loginbb://auth");
 BBLogin.setInstallationCredentials(“InstallationId”,”InstallationSecret”)
 ```
 
 Caso, seu aplicativo esteja em fase de desenvolvimento e você ainda não possua backend funcional, você pode definir o seu PARTNER_ID and PARTNER_SECRET no SDK.
-Entretanto, você não deve publicar seu aplicativo dessa maneira. Isso acabaria por expor suas credenciais, permitindo que outras pessoas gerem credenciais de instalação vinculados ao seu aplicativo.
+**Entretanto, você não deve publicar seu aplicativo dessa maneira. Isso acabaria por expor suas credenciais, permitindo que outras pessoas gerem credenciais de instalação vinculados ao seu aplicativo.**
 
 ```
 BBLogin.setPartnerId("7da5626c-050a-4c14-874d-6c188f8abdf");
@@ -130,9 +131,10 @@ Explore o example existente nesse projeto para entender um pouco funcionamento d
 
 ### Aplicação de Teste
 
+```
 PushCode = 12345678
 RedirectUrl = loginbb://auth
 PartnerId = 7da5626c-050a-4c14-874d-6c188f8abdf
 PartnerSecret = 7b244153-35ea-4d79-810c-ebd8cc921573
-
+```
  
